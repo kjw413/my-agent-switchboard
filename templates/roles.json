@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "_readme": "이 파일이 오케스트레이션의 단일 손잡이입니다. active_profile 한 줄만 바꾸면 Claude와 Codex의 역할이 통째로 바뀝니다. 세부 조정은 profiles 안의 model/effort를 직접 고치세요. 라우팅 게이트는 warn 모드(AGENT_BROKER_GATE_MODE=warn)라서 이 파일을 바꾸는 데 승인이나 override 명령이 필요하지 않습니다. 고친 뒤에는 %USERPROFILE%\\.claude\\orchestration\\sync-roles.ps1을 실행하거나 Claude Code를 다시 시작하세요. 세션 시작 훅이 네이티브 롤 파일의 model/effort를 이 값에 맞춥니다. 프로젝트별 설정은 <프로젝트 루트>\\.orchestration\\roles.json에 두면 이 파일보다 우선합니다.",
+
+  "active_profile": "claude-lead",
+
+  "_valid_values": {
+    "vendor": ["claude", "codex"],
+    "claude_model": ["haiku", "sonnet", "opus", "fable"],
+    "claude_effort": ["low", "medium", "high", "xhigh", "max"],
+    "codex_model": ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"],
+    "codex_effort": ["minimal", "low", "medium", "high", "xhigh", "max"],
+    "mechanism": [
+      "native_subagent: Claude 전용. Agent 툴로 세션 안에서 실행합니다. effort는 롤 파일 frontmatter가 결정하며 sync-roles.ps1이 맞춰 둡니다.",
+      "route_agent_task: 두 벤더 모두. MCP를 거쳐 외부 CLI를 호출합니다. 벤더를 넘을 때 씁니다."
+    ],
+    "_note": "목록에 없는 값도 적용되지만 sync-roles.ps1이 경고합니다. 새 모델이 나오면 이 목록에 추가하세요. effort를 null로 두면 롤 파일에서 effort 줄을 지웁니다."
+  },
+
+  "_mechanism_note": "mechanism은 Claude 브레인 기준으로 적혀 있습니다. Codex 브레인은 AGENTS.md의 재판정 규칙(같은 벤더면 네이티브, 다른 벤더면 route_agent_task)을 따릅니다. Codex 쪽 reader/implementer 값은 %USERPROFILE%\\.codex\\agents\\explorer.toml / worker.toml에 동기화됩니다.",
+
+  "profiles": {
+    "claude-lead": {
+      "description": "Claude가 설계와 판단을 쥐고, 반대 의견과 리뷰만 Codex에서 받습니다. 기본값.",
+      "roles": {
+        "consultant": {
+          "_role": "반대 벤더 시각의 설계 검토, 하드 진단, 2차 의견",
+          "vendor": "codex",
+          "model": "gpt-5.6-sol",
+          "effort": "xhigh",
+          "mechanism": "route_agent_task"
+        },
+        "implementer": {
+          "_role": "승인된 계획에 따른 구현과 테스트",
+          "vendor": "claude",
+          "model": "sonnet",
+          "effort": "medium",
+          "mechanism": "native_subagent",
+          "agent_type": "economy-worker"
+        },
+        "reader": {
+          "_role": "읽기, 검색, 추출, 증거 수집",
+          "vendor": "claude",
+          "model": "haiku",
+          "effort": null,
+          "mechanism": "native_subagent",
+          "agent_type": "Explore"
+        },
+        "reviewer": {
+          "_role": "코드 리뷰, 감사, 회귀 점검",
+          "vendor": "codex",
+          "model": "gpt-5.6-terra",
+          "effort": "medium",
+          "mechanism": "route_agent_task"
+        }
+      }
+    },
+
+    "codex-lead": {
+      "description": "Codex가 구현과 읽기를 맡고, Claude가 컨설턴트와 리뷰어로 붙습니다.",
+      "roles": {
+        "consultant": {
+          "_role": "반대 벤더 시각의 설계 검토, 하드 진단, 2차 의견",
+          "vendor": "claude",
+          "model": "opus",
+          "effort": "max",
+          "mechanism": "native_subagent",
+          "agent_type": "consultant"
+        },
+        "implementer": {
+          "_role": "승인된 계획에 따른 구현과 테스트",
+          "vendor": "codex",
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "mechanism": "route_agent_task"
+        },
+        "reader": {
+          "_role": "읽기, 검색, 추출, 증거 수집",
+          "vendor": "codex",
+          "model": "gpt-5.6-terra",
+          "effort": "medium",
+          "mechanism": "route_agent_task"
+        },
+        "reviewer": {
+          "_role": "코드 리뷰, 감사, 회귀 점검",
+          "vendor": "claude",
+          "model": "opus",
+          "effort": "max",
+          "mechanism": "native_subagent",
+          "agent_type": "consultant"
+        }
+      }
+    },
+
+    "claude-only": {
+      "description": "Codex 쿼터를 아끼거나 Codex CLI가 죽었을 때. 모든 역할이 Claude 안에서 돕니다.",
+      "roles": {
+        "consultant": {
+          "_role": "반대 벤더 시각의 설계 검토, 하드 진단, 2차 의견",
+          "vendor": "claude",
+          "model": "opus",
+          "effort": "max",
+          "mechanism": "native_subagent",
+          "agent_type": "consultant"
+        },
+        "implementer": {
+          "_role": "승인된 계획에 따른 구현과 테스트",
+          "vendor": "claude",
+          "model": "sonnet",
+          "effort": "xhigh",
+          "mechanism": "native_subagent",
+          "agent_type": "economy-worker"
+        },
+        "reader": {
+          "_role": "읽기, 검색, 추출, 증거 수집",
+          "vendor": "claude",
+          "model": "sonnet",
+          "effort": "high",
+          "mechanism": "native_subagent",
+          "agent_type": "Explore"
+        },
+        "reviewer": {
+          "_role": "코드 리뷰, 감사, 회귀 점검",
+          "vendor": "claude",
+          "model": "opus",
+          "effort": "max",
+          "mechanism": "native_subagent",
+          "agent_type": "consultant"
+        }
+      }
+    },
+
+    "codex-only": {
+      "description": "Claude 쿼터를 아낄 때. brain만 Claude 세션이고 위임 작업은 모두 Codex가 합니다.",
+      "roles": {
+        "consultant": {
+          "_role": "반대 벤더 시각의 설계 검토, 하드 진단, 2차 의견",
+          "vendor": "codex",
+          "model": "gpt-5.6-sol",
+          "effort": "max",
+          "mechanism": "route_agent_task"
+        },
+        "implementer": {
+          "_role": "승인된 계획에 따른 구현과 테스트",
+          "vendor": "codex",
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "mechanism": "route_agent_task"
+        },
+        "reader": {
+          "_role": "읽기, 검색, 추출, 증거 수집",
+          "vendor": "codex",
+          "model": "gpt-5.6-terra",
+          "effort": "medium",
+          "mechanism": "route_agent_task"
+        },
+        "reviewer": {
+          "_role": "코드 리뷰, 감사, 회귀 점검",
+          "vendor": "codex",
+          "model": "gpt-5.6-sol",
+          "effort": "xhigh",
+          "mechanism": "route_agent_task"
+        }
+      }
+    }
+  },
+
+  "_known_issues": {
+    "codex_receipt_bug": "agent-switchboard 1.0.39~1.0.47에서 target_agent=codex 디스패치는 성공해도 응답에 receipt 필드가 없어 라우팅 원장에 'no-credit / missing or malformed receipt'로 기록됩니다. 게이트가 warn 모드라 실제 차단은 없지만 routing-report의 크레딧 집계는 Codex 레인을 적게 셉니다. 작업 자체는 정상입니다.",
+    "no_gemini_lane": "Gemini/Antigravity 구독이 없는 환경을 전제로 합니다. Flash 레인은 항상 unavailable_pre_mutation으로 실패하므로 이 매니페스트에는 넣지 않습니다.",
+    "shared_agent_type": "두 역할이 같은 agent_type을 가리키면 롤 파일이 하나뿐이므로 model/effort도 같아야 합니다. 값이 다르면 sync-roles.ps1이 경고하고 먼저 나온 역할의 값을 씁니다."
+  }
+}

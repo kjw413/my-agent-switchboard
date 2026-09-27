@@ -1,0 +1,15 @@
+# 테스트는 %TEMP% 아래에서만 돕니다. 혹시 저장소 안에 남는 산출물이 커밋되지 않게 막습니다.
+swkit-test-*/
+swkit-mut-*/
+*.log
+
+# 개인 설정 사본이나 설치 기록을 저장소에 넣지 않습니다.
+/orchestration/
+/orchestration-backups/
+install-state.json
+
+# 편집기 / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
