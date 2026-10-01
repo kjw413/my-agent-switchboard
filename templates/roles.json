@@ -8,7 +8,7 @@
     "vendor": ["claude", "codex"],
     "claude_model": ["haiku", "sonnet", "opus", "fable"],
     "claude_effort": ["low", "medium", "high", "xhigh", "max"],
-    "codex_model": ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"],
+    "codex_model": ["gpt-6.1-luna", "gpt-6.1-terra", "gpt-6.1-sol"],
     "codex_effort": ["minimal", "low", "medium", "high", "xhigh", "max"],
     "mechanism": [
       "native_subagent: Claude 전용. Agent 툴로 세션 안에서 실행합니다. effort는 롤 파일 frontmatter가 결정하며 sync-roles.ps1이 맞춰 둡니다.",
@@ -26,7 +26,7 @@
         "consultant": {
           "_role": "반대 벤더 시각의 설계 검토, 하드 진단, 2차 의견",
           "vendor": "codex",
-          "model": "gpt-5.6-sol",
+          "model": "gpt-6.1-sol",
           "effort": "xhigh",
           "mechanism": "route_agent_task"
         },
@@ -49,7 +49,7 @@
         "reviewer": {
           "_role": "코드 리뷰, 감사, 회귀 점검",
           "vendor": "codex",
-          "model": "gpt-5.6-terra",
+          "model": "gpt-6.1-terra",
           "effort": "medium",
           "mechanism": "route_agent_task"
         }
@@ -70,14 +70,14 @@
         "implementer": {
           "_role": "승인된 계획에 따른 구현과 테스트",
           "vendor": "codex",
-          "model": "gpt-5.6-sol",
+          "model": "gpt-6.1-sol",
           "effort": "high",
           "mechanism": "route_agent_task"
         },
         "reader": {
           "_role": "읽기, 검색, 추출, 증거 수집",
           "vendor": "codex",
-          "model": "gpt-5.6-terra",
+          "model": "gpt-6.1-terra",
           "effort": "medium",
           "mechanism": "route_agent_task"
         },
@@ -136,28 +136,28 @@
         "consultant": {
           "_role": "반대 벤더 시각의 설계 검토, 하드 진단, 2차 의견",
           "vendor": "codex",
-          "model": "gpt-5.6-sol",
+          "model": "gpt-6.1-sol",
           "effort": "max",
           "mechanism": "route_agent_task"
         },
         "implementer": {
           "_role": "승인된 계획에 따른 구현과 테스트",
           "vendor": "codex",
-          "model": "gpt-5.6-sol",
+          "model": "gpt-6.1-sol",
           "effort": "high",
           "mechanism": "route_agent_task"
         },
         "reader": {
           "_role": "읽기, 검색, 추출, 증거 수집",
           "vendor": "codex",
-          "model": "gpt-5.6-terra",
+          "model": "gpt-6.1-terra",
           "effort": "medium",
           "mechanism": "route_agent_task"
         },
         "reviewer": {
           "_role": "코드 리뷰, 감사, 회귀 점검",
           "vendor": "codex",
-          "model": "gpt-5.6-sol",
+          "model": "gpt-6.1-sol",
           "effort": "xhigh",
           "mechanism": "route_agent_task"
         }
